@@ -1,14 +1,26 @@
-const sequelize = require('../db')
-const {INTEGER, STRING, BOOLEAN} = require('sequelize')
-// Всё до этой строчки - подгрузка модулей и файлов JS
+const {INTEGER, STRING, DATE, FLOAT, ENUM, TEXT, NOW} = require('sequelize');
+const sequelize = require('../db');
 
 const User = sequelize.define ('user', {
     id: {type: INTEGER, autoIncrement: true, primaryKey: true},
+    firstName: {type: STRING, allowNull: false},
+    lastName: {type: STRING, allowNull: false},
+    nickname: {type: STRING, unique: true, allowNull: false},
     email: {type: STRING, unique: true, allowNull: false},
-    password: {type: STRING, allowNull: false},
-    role: {type: STRING, defaultValue: "USER"},
-}) // Описание первого объекта (собственно - модели БД (слишком долго объяснять и мне лень) Вкратце - заготовки для ORM, чтобы она просто пришла, сделала нужные запросы на создание с нужными параметрами и БД уже была готова на запись)
+    ip: {type: STRING, allowNull: false},
+    country: {type: STRING, allowNull: false},
+    referralCode: {type: STRING},
+    promoCode: {type: STRING},
+    registrationDate: {type: DATE, defaultValue: NOW},
+    balance: {type: FLOAT, defaultValue: 0},
+    depositCount: {type: INTEGER, defaultValue: 0},
+    depositSum: {type: FLOAT, defaultValue: 0},
+    betCount: {type: INTEGER, defaultValue: 0},
+    accountStatus: {type:ENUM('Normal', 'Silver', 'Gold'), defaultValue: 'Normal'},
+    accountVerification: {type: ENUM('KYC Required', 'Awaiting Approval', 'Verified', 'Banned'), defaultValue: 'KYC Required'},
+    banComment: {type: TEXT},
+    actionLog: {type: TEXT},
+    transactionLog: {type: TEXT}
+});
 
-module.exports = {
-    User,
-} // экспорт объектов для дальнейшей работы
+module.exports = User;
