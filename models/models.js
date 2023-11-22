@@ -43,6 +43,15 @@ const Messages = sequelize.define ('messages' , {
     text: {type: STRING , allowNull: false}
 });
 
+const Chat = sequelize.define('chat', {
+    id: {type: INTEGER, autoIncrement: true, primaryKey: true},
+    message: {type: STRING, allowNull: false},
+    sentAt: {type: DATE, defaultValue: NOW},
+    // nickname: {type: STRING, allowNull: false},
+    // avatar: {type: STRING},
+    // status: {type: STRING}, хз надо это или нет
+})
+
 User.hasMany(Transactions)
 Transactions.belongsTo(User);
 
@@ -51,5 +60,11 @@ Messages.belongsTo(User);
 
 UserAdmin.hasOne(User)
 User.belongsTo(UserAdmin);
+
+User.hasMany(Chat);
+Chat.belongsTo(User);
+
+UserAdmin.hasMany(Chat);
+Chat.belongsTo(UserAdmin);
 
 module.exports = User;
