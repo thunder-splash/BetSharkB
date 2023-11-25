@@ -32,6 +32,44 @@ class UserController {
         } catch (e) {
             new next(ApiError.internal(e.message))
         }
+
+
+        const multer = require('multer')
+        const path = require('path')
+
+// Настройка multer
+        const storage = multer.diskStorage({
+            destination: function(req, file, cb) {
+                cb(null, 'uploads/')
+            },
+            filename: function(req, file, cb) {
+                cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+            }
+        })
+
+        const upload = multer({ storage: storage })
+
+// В вашем роутере
+        router.post('/registration', upload.single('avatar'), async (req, res, next) => {
+            try {
+                const { email, password, role } = req.body
+                const candidate = await User.findOne({ where: { email } })
+                if (candidate) {
+                    throw new next(ApiError.badRequest('Пользователь с таким почтовым адесом уже существует'))
+                }
+                const hashPassword = await bcrypt.hash(password, 5)
+                const user = await User.create({
+                    email,
+                    password: hashPassword,
+                    role,
+                    avatar: req.file.path // Сохранение пути к изображению в базе данных
+                })
+                const token = generateJwt(user.id, user.email, user.role)
+                return res.json({token})
+            } catch (e) {
+                new next(ApiError.internal(e.message))
+            }
+        })
     }
 
     async login(req, res, next) {
